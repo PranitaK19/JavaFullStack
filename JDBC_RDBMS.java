@@ -83,7 +83,6 @@ public class JDBC_RDBMS {
 		}
 	}
 
-	// ✅ DELETE MULTIPLE EMPLOYEES BY ID
 	public static void deleteMultipleById(String tblName, List<Integer> ids) {
 		String query = "DELETE FROM " + tblName + " WHERE id = ?";
 		try (Connection con = getConnection();
@@ -129,8 +128,8 @@ public class JDBC_RDBMS {
 			System.out.println("3 . Update Single Row ");
 			System.out.println("4 . Show Table ");
 			System.out.println("5 . Update Multiple Employees");
-			System.out.println("6 . Exit Application");
-			System.out.println("7 . Delete Multiple Employees by ID");
+			System.out.println("6 . Delete Multiple Employees by ID");
+			System.out.println("7 . Exit Application"); 
 			System.out.print("Enter your choice: ");
 			choice = scanner.nextInt();
 			scanner.nextLine(); // flush newline
@@ -181,11 +180,6 @@ public class JDBC_RDBMS {
 					break;
 
 				case 6:
-					System.out.println("Exiting....");
-					scanner.close();
-					return;
-
-				case 7:
 					System.out.print("How many IDs you want to delete? ");
 					int n = scanner.nextInt();
 					List<Integer> idsToDelete = new ArrayList<>();
@@ -195,6 +189,11 @@ public class JDBC_RDBMS {
 					}
 					deleteMultipleById(tableName, idsToDelete);
 					break;
+
+				case 7:
+					System.out.println("Exiting....");
+					scanner.close();
+					return;
 
 				default:
 					System.out.println("Invalid choice... select again");
