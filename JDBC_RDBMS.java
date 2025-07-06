@@ -1,10 +1,9 @@
 package jdbcdemo;
 
-
 import java.sql.*;
 import java.util.*;
 
-public class JDBC_RDBMS{
+public class JDBC_RDBMS {
 	private static final String URL = "jdbc:postgresql://localhost:5432/mydb";
 	private static final String USER = "postgres";
 	private static final String PASSWD = "bappa@19";
@@ -84,6 +83,24 @@ public class JDBC_RDBMS{
 		}
 	}
 
+	// ✅ DELETE MULTIPLE EMPLOYEES BY ID
+	public static void deleteMultipleById(String tblName, List<Integer> ids) {
+		String query = "DELETE FROM " + tblName + " WHERE id = ?";
+		try (Connection con = getConnection();
+			 PreparedStatement pstmt = con.prepareStatement(query)) {
+
+			for (int id : ids) {
+				pstmt.setInt(1, id);
+				pstmt.addBatch();
+			}
+
+			int[] deleted = pstmt.executeBatch();
+			System.out.println(deleted.length + " rows deleted using batch.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void showTable(String tblName) {
 		String sql = "SELECT * FROM " + tblName;
 		try (Connection con = JDBC_RDBMS.getConnection();
@@ -107,14 +124,16 @@ public class JDBC_RDBMS{
 		String tableName = "empdetails";
 		int choice;
 		while (true) {
-			System.out.println("1 . Create Table ");
+			System.out.println("\n1 . Create Table ");
 			System.out.println("2 . Insert Data into Table ");
 			System.out.println("3 . Update Single Row ");
 			System.out.println("4 . Show Table ");
 			System.out.println("5 . Update Multiple Employees");
 			System.out.println("6 . Exit Application");
+			System.out.println("7 . Delete Multiple Employees by ID");
+			System.out.print("Enter your choice: ");
 			choice = scanner.nextInt();
-			scanner.nextLine();
+			scanner.nextLine(); // flush newline
 
 			switch (choice) {
 				case 1:
@@ -127,24 +146,24 @@ public class JDBC_RDBMS{
 					break;
 
 				case 2:
-					System.out.println("Enter Name :");
+					System.out.print("Enter Name: ");
 					String name = scanner.nextLine();
-					System.out.println("Enter Age :");
+					System.out.print("Enter Age: ");
 					int age = scanner.nextInt();
-					System.out.println("Enter Salary :");
+					System.out.print("Enter Salary: ");
 					double salary = scanner.nextDouble();
 					JDBC_RDBMS.insertData(tableName, name, age, salary);
 					break;
 
 				case 3:
-					System.out.println("Enter ID to update : ");
+					System.out.print("Enter ID to update: ");
 					int updateID = scanner.nextInt();
-					scanner.nextLine(); // consume leftover newline
-					System.out.println("Enter Name :");
+					scanner.nextLine();
+					System.out.print("Enter Name: ");
 					String newname = scanner.nextLine();
-					System.out.println("Enter Age :");
+					System.out.print("Enter Age: ");
 					int newage = scanner.nextInt();
-					System.out.println("Enter Salary :");
+					System.out.print("Enter Salary: ");
 					double newsalary = scanner.nextDouble();
 					JDBC_RDBMS.updateData(tableName, updateID, newname, newage, newsalary);
 					break;
@@ -154,7 +173,6 @@ public class JDBC_RDBMS{
 					break;
 
 				case 5:
-					// test multiple update using collection
 					List<Employee> list = new ArrayList<>();
 					list.add(new Employee(1, "Pranita", 23, 60000));
 					list.add(new Employee(2, "Mahesh", 28, 62000));
@@ -167,10 +185,20 @@ public class JDBC_RDBMS{
 					scanner.close();
 					return;
 
+				case 7:
+					System.out.print("How many IDs you want to delete? ");
+					int n = scanner.nextInt();
+					List<Integer> idsToDelete = new ArrayList<>();
+					for (int i = 0; i < n; i++) {
+						System.out.print("Enter ID to delete: ");
+						idsToDelete.add(scanner.nextInt());
+					}
+					deleteMultipleById(tableName, idsToDelete);
+					break;
+
 				default:
 					System.out.println("Invalid choice... select again");
 			}
 		}
 	}
 }
-
